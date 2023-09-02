@@ -19,6 +19,8 @@ public class customerDaoServiceImpl implements CustomerDaoService{
 	ArrayList<Customer> customerList=new ArrayList<>();
 	
 	private static Connection connection = null;	
+	Customer currentCustomer = new Customer();
+	
 	public customerDaoServiceImpl() {
 		try {
 			connection = DButil.getConnection();
@@ -87,8 +89,46 @@ public class customerDaoServiceImpl implements CustomerDaoService{
 
 	@Override
 	public boolean customerLoginValidation(String username, String password) {
-		// TODO Auto-generated method stub
-		return false;
+
+		System.out.println("username="+username+"password"+password);
+		boolean flag=false;
+		String loginQuery="SELECT * FROM customer where username='"+username+"'";
+		PreparedStatement stmt;
+
+		try {
+			stmt = connection.prepareStatement(loginQuery);
+			ResultSet rs =   stmt.executeQuery();//cust data will be stored in rs
+			while(rs.next()) {
+				
+				if(rs.getString(8).equals(username) && rs.getString(9).equals(password))
+				{
+					
+				flag=true;
+				System.out.println(flag);
+				System.out.println("Login successfull!!");
+				
+				currentCustomer.setCustomerId(rs.getInt(1));  //1 is in database 1st colm
+				currentCustomer.setCustomerName(rs.getString(2));
+				currentCustomer.setGender(rs.getString(3));
+				currentCustomer.setContactNo(rs.getLong(4));
+				currentCustomer.setEmail(rs.getString(5));
+				currentCustomer.setAddress(rs.getString(6));
+				currentCustomer.setPincode(rs.getInt(7));
+				currentCustomer.setUsername(rs.getString(8));
+				currentCustomer.setPassword(rs.getString(9));
+				}
+				else {
+					flag=false;
+					System.out.println("Invalid customer data");
+				}
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.out.println(flag);
+		return flag;
 	}
 
 	@Override
